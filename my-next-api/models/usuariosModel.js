@@ -50,6 +50,20 @@ class UsuarioModel {
             throw new Error('Erro ao atualizar senha.');
         }
     }
+
+    async deletarUsuario(id) {
+        const pool = await connectToDatabase();
+        try {
+            const query = 'DELETE FROM usuarios WHERE id = @id;';
+            const result = await pool.request()
+                .input('id', id)
+                .query(query);
+            return result;
+        } catch (error) {
+            console.error('Erro ao deletar usuário:', error);
+            throw new Error('Erro ao deletar usuário.');
+        }
+    }
 }
 
 export default new UsuarioModel();
