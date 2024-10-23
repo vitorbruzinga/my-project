@@ -50,19 +50,33 @@ export default async function handler(req, res) {
             break;
 
         case 'PUT':
-            const { id, codigo: novoCodigo, descricao: novaDescricao, modelosCompativeis: novosModelos } = req.body;
+            // Extrai os valores do corpo da requisição
+            const { codigo: novoCodigo, descricao: novaDescricao, modelosCompativeis: novosModelos } = req.body;
+
+            // Log dos valores recebidos
+            console.log('Valores recebidos:', { novoCodigo, novaDescricao, novosModelos });
+
             try {
-                await PecasModel.atualizarPeca(id, novoCodigo, novaDescricao, novosModelos);
+                // Atualiza a peça com os valores extraídos
+                await PecasModel.atualizarPeca(novoCodigo, novaDescricao, novosModelos);
                 res.status(200).json({ message: 'Peça atualizada com sucesso!' });
             } catch (error) {
+                // Retorna erro em caso de falha
                 res.status(500).json({ error: error.message });
             }
             break;
 
+
         case 'DELETE':
-            const { id: idParaRemover } = req.body;
+            const { codigo: codigoParaRemover } = req.body;
+
+            // Verifique se o código está presente
+            if (codigoParaRemover === undefined || codigoParaRemover === null) {
+                return res.status(400).json({ error: 'Código é necessário para remover a peça.' });
+            }
+
             try {
-                await PecasModel.removerPeca(idParaRemover);
+                await PecasModel.removerPeca(codigoParaRemover); // código já é um número
                 res.status(200).json({ message: 'Peça removida com sucesso!' });
             } catch (error) {
                 res.status(500).json({ error: error.message });
@@ -72,5 +86,7 @@ export default async function handler(req, res) {
         default:
             res.setHeader('Allow', ['POST', 'GET', 'PUT', 'DELETE']);
             res.status(405).end(`Método ${req.method} não permitido`);
+
     }
+
 }

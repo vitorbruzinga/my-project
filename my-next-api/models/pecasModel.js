@@ -90,18 +90,20 @@ class PecasModel {
     }
 
 
-    async removerPeca(id) {
+    async removerPeca(codigo) {
         const pool = await connectToDatabase();
         try {
-            const query = 'DELETE FROM PecasCarro WHERE Id = @id;';
+            const query = 'DELETE FROM PecasCarro WHERE Codigo = @codigo;';
             await pool.request()
-                .input('id', sql.Int, id) // Adicionei o tipo de dado
+                .input('codigo', sql.Int, codigo) // A variável codigo deve ser do tipo sql.Int
                 .query(query);
         } catch (error) {
             console.error('Erro ao remover peça:', error);
             throw new Error('Erro ao remover peça: ' + error.message);
         }
     }
+
+
 }
 
 export default new PecasModel();
