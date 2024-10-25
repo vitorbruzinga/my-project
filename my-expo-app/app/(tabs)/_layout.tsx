@@ -1,36 +1,30 @@
-import { Tabs } from 'expo-router';
+// app/tabs/_layout.tsx
 import React from 'react';
-
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Tabs } from 'expo-router';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-      }}>
+        tabBarStyle: { display: 'none' },
+        headerShown: false // Esconde o cabecalho
+      }}
+    >
       <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
-          ),
-        }}
+        name="Screens/HomePage/home" 
+        options={{ tabBarLabel: 'Home' }}
       />
+
+      {/* Aba de Login */}
       <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
-        }}
+        name="Screens/Login/login" 
+        options={{ tabBarLabel: 'Login' }}
+      />
+
+      {/* Aba de Criar Usuário */}
+      <Tabs.Screen
+        name="Screens/CreateUser/createUser"
+        options={{ tabBarLabel: 'Criar Conta' }}
       />
     </Tabs>
   );

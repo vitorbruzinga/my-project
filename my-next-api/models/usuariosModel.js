@@ -1,5 +1,6 @@
 // models/usuariosModel.js
 import { connectToDatabase } from '../config/dbConfig';
+import bcrypt from 'bcrypt'; // Importando bcrypt
 
 class UsuarioModel {
     async cadastrarUsuario(nome, dataNascimento, email, senha) {
@@ -20,6 +21,27 @@ class UsuarioModel {
         } catch (error) {
             console.error('Erro ao cadastrar usuário:', error);
             throw new Error('Erro ao cadastrar usuário.');
+        }
+    }
+
+    async login(email, senha) {
+        const pool = await connectToDatabase();
+        try {
+            const usuario = await this.buscarUsuarioPorEmail(email); // Recupera o usuário pelo email
+            if (!usuario) {
+                throw new Error('Usuário não encontrado');
+            }
+
+            // Verifica se a senha está correta
+            const senhaValida = await bcrypt.compare(senha, usuario.senha);
+            if (!senhaValida) {
+                throw new Error('Senha incorreta');
+            }
+
+            return usuario; // Retorna o usuário se a senha estiver correta
+        } catch (error) {
+            console.error('Erro ao fazer login:', error);
+            throw new Error('Erro ao fazer login.');
         }
     }
 

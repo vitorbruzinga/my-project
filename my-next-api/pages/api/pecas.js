@@ -27,7 +27,7 @@ export default async function handler(req, res) {
             break;
 
         case 'GET':
-            const { codigo: codigoConsulta } = req.query; // Pega o código da query
+            const { codigo: codigoConsulta } = req.query;
             if (codigoConsulta) {
                 try {
                     const peca = await PecasModel.buscarPecaPorCodigo(codigoConsulta);
@@ -50,18 +50,16 @@ export default async function handler(req, res) {
             break;
 
         case 'PUT':
-            // Extrai os valores do corpo da requisição
             const { codigo: novoCodigo, descricao: novaDescricao, modelosCompativeis: novosModelos } = req.body;
-
             // Log dos valores recebidos
             console.log('Valores recebidos:', { novoCodigo, novaDescricao, novosModelos });
 
             try {
-                // Atualiza a peça com os valores extraídos
+                // Atualiza a peça
                 await PecasModel.atualizarPeca(novoCodigo, novaDescricao, novosModelos);
                 res.status(200).json({ message: 'Peça atualizada com sucesso!' });
             } catch (error) {
-                // Retorna erro em caso de falha
+
                 res.status(500).json({ error: error.message });
             }
             break;
@@ -69,14 +67,11 @@ export default async function handler(req, res) {
 
         case 'DELETE':
             const { codigo: codigoParaRemover } = req.body;
-
-            // Verifique se o código está presente
             if (codigoParaRemover === undefined || codigoParaRemover === null) {
                 return res.status(400).json({ error: 'Código é necessário para remover a peça.' });
             }
-
             try {
-                await PecasModel.removerPeca(codigoParaRemover); // código já é um número
+                await PecasModel.removerPeca(codigoParaRemover);
                 res.status(200).json({ message: 'Peça removida com sucesso!' });
             } catch (error) {
                 res.status(500).json({ error: error.message });
