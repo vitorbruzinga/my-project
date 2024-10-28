@@ -1,108 +1,69 @@
 // app/tabs/Screens/StartMenu/profile.js
 import React, { useEffect, useState } from 'react';
 import BackButton from '../backButton';
-import { View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { Image, View, Text, Alert, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Profile() {
     const [userInfo, setUserInfo] = useState(null);
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const navigation = useNavigation();
-    const route = useRoute(); // Captura a rota atual
-    const { email } = route.params || {}; // Obtém o email da rota (agora com fallback)
 
-    useEffect(() => {
-        async function fetchUserData() {
-            if (!email) {
-                Alert.alert('Erro', 'Email do usuário não encontrado.');
-                return;
-            }
-
-            try {
-                const response = await fetch(`http://10.0.2.2:3000/api/usuarios?email=${email}`);
-                const data = await response.json();
-
-                if (data && data.nome && data.email && data.dataNascimento) {
-                    setUserInfo(data);
-                } else {
-                    Alert.alert('Erro', 'Dados do usuário não encontrados.');
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchUserData = async () => {
+                const storedEmail = await AsyncStorage.getItem('email'); // Recuperar o email do AsyncStorage
+                console.log(storedEmail);
+                if (!storedEmail) {
+                    Alert.alert('Erro', 'Email do usuário não encontrado.');
+                    return;
                 }
-            } catch (error) {
-                console.error('Erro ao buscar informações do usuário:', error);
-                Alert.alert('Erro', 'Falha ao buscar informações do usuário.');
-            }
-        }
-        fetchUserData();
-    }, [email]);
 
-    const handleChangePassword = async () => {
-        if (!newPassword || !confirmPassword) {
-            return Alert.alert('Erro', 'Por favor, preencha todos os campos!');
-        }
+                try {
+                    const response = await fetch(`http://10.0.2.2:3000/api/usuarios?email=${storedEmail}`);
+                    const data = await response.json();
 
-        if (newPassword !== confirmPassword) {
-            return Alert.alert('Erro', 'As senhas não coincidem!');
-        }
+                    if (data && data.Nome && data.Email && data.DataNascimento) {
+                        setUserInfo(data);
+                    } else {
+                        Alert.alert('Erro', 'Dados do usuário não encontrados.');
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar informações do usuário:', error);
+                    Alert.alert('Erro', 'Falha ao buscar informações do usuário.');
+                }
+            };
 
-        const jsonData = {
-            email: userInfo.email,
-            senha: newPassword,
-        };
+            fetchUserData();
+        }, [])
+    );
 
-        try {
-            const response = await fetch('http://10.0.2.2:3000/api/usuarios', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    acao: 'alterarSenha',
-                    ...jsonData,
-                }),
-            });
+    const handleChangePassword = () => {
+        navigation.navigate('Screens/ResetPassword/RequestResetCode'); 
+    };
 
-            if (response.ok) {
-                Alert.alert('Sucesso', 'Senha alterada com sucesso!');
-                setNewPassword('');
-                setConfirmPassword('');
-            } else {
-                const data = await response.json();
-                Alert.alert('Erro', data.error || 'Erro ao alterar a senha.');
-            }
-        } catch (error) {
-            console.error('Erro ao alterar a senha:', error);
-            Alert.alert('Erro', 'Falha ao conectar com o servidor.');
-        }
+    // Função para formatar a data
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR', options); // Formato: DD/MM/AAAA
     };
 
     return (
         <View style={styles.container}>
+            <Image
+                source={require('../../../../assets/images/boxpro_logo.png')}
+                style={styles.logo}
+            />
             {userInfo ? (
                 <>
-                    <Text style={styles.title}>{userInfo.nome}</Text>
-                    <Text style={styles.info}>Email: {userInfo.email}</Text>
-                    <Text style={styles.info}>Data de Nascimento: {userInfo.dataNascimento}</Text>
+                    <Text style={styles.title}>{userInfo.Nome}</Text>
+                    <Text style={styles.info}>Email: {userInfo.Email}</Text>
+                    <Text style={styles.info}>Data de Nascimento: {formatDate(userInfo.DataNascimento)}</Text>
                     <BackButton onPress={() => navigation.navigate('Screens/StartMenu/startmenu')} />
                     <TouchableOpacity style={styles.changePasswordButton} onPress={handleChangePassword}>
                         <Text style={styles.buttonText}>Mudar Senha</Text>
                     </TouchableOpacity>
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Nova Senha"
-                        secureTextEntry
-                        value={newPassword}
-                        onChangeText={setNewPassword}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Confirme a Nova Senha"
-                        secureTextEntry
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                    />
-                    <Button title="Salvar" onPress={handleChangePassword} />
                 </>
             ) : (
                 <Text style={styles.loading}>Carregando informações do usuário...</Text>
@@ -112,6 +73,11 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
+    logo: {
+        width: 300,
+        height: 150,
+        marginBottom: 25,
+    },
     container: {
         flex: 1,
         backgroundColor: '#000000',
@@ -137,15 +103,6 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: '#FFFFFF',
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 10,
-        width: '100%',
-        padding: 10,
-        color: '#000',
     },
     loading: {
         color: '#FFFFFF',

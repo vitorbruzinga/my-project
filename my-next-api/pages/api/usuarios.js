@@ -26,6 +26,8 @@ export default async function handler(req, res) {
                         const { email: emailLogin, senha: senhaLogin } = req.body;
                         try {
                             const usuario = await UsuariosModel.buscarUsuarioPorEmail(emailLogin);
+                            console.log(usuario);
+                            console.log(usuario.Email);
                             if (!usuario) {
                                 return res.status(401).json({ error: 'Credenciais inválidas.' });
                             }
@@ -34,7 +36,7 @@ export default async function handler(req, res) {
                                 return res.status(401).json({ error: 'Credenciais inválidas.' });
                             }
                             const token = jwt.sign({ id: usuario.Id }, 'seu-segredo', { expiresIn: '1h' });
-                            res.status(200).json({ message: 'Login bem-sucedido', token });
+                            res.status(200).json({ message: 'Login bem-sucedido', token, email: usuario.Email });
                         } catch (error) {
                             console.error("Erro ao realizar login:", error);
                             res.status(500).json({ error: 'Erro ao realizar login. Por favor, verifique os dados e tente novamente.' });

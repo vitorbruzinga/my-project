@@ -11,7 +11,7 @@ export default function StartMenu() {
         try {
             await AsyncStorage.removeItem('token'); // Remove o token do AsyncStorage
             Alert.alert('Logout', 'Você foi desconectado com sucesso!', [
-                { text: 'OK', onPress: () => navigation.navigate('Screens/HomePage/home') }, // Navega para a tela Home
+                { text: 'OK', onPress: () => navigation.navigate('Screens/HomePage/home') },
             ]);
         } catch (error) {
             console.error('Erro ao deslogar:', error);
@@ -44,21 +44,21 @@ export default function StartMenu() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000000', // Modo escuro
+        backgroundColor: '#000000',
         justifyContent: 'flex-start',
         alignItems: 'center',
         padding: 20,
     },
     logo: {
         marginTop: 50,
-        width: 300, // Ajuste o tamanho conforme necessário
-        height: 150, // Ajuste o tamanho conforme necessário
-        marginBottom: 25 // Margem para não ficar muito colado em cima
+        width: 300,
+        height: 150,
+        marginBottom: 25
     },
     option: {
-        color: '#FFFFFF', // Cor do texto
+        color: '#FFFFFF',
         fontSize: 35,
-        textDecorationLine: 'underline', // Sublinhar o texto
-        marginVertical: 10, // Espaço entre as opções
+        textDecorationLine: 'underline',
+        marginVertical: 10,
     },
 });

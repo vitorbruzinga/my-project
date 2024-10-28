@@ -42,6 +42,9 @@ export default function Login() {
 
             if (response.ok) {
                 await AsyncStorage.setItem('token', data.token);
+                console.log("Email do usuário:", data.email);
+                await AsyncStorage.setItem('email', data.email);
+
                 Alert.alert('Sucesso', 'Login bem-sucedido!');
                 navigation.navigate('Screens/StartMenu/startmenu', { email: email });
             } else {
