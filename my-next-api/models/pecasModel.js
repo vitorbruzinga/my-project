@@ -94,14 +94,18 @@ class PecasModel {
         const pool = await connectToDatabase();
         try {
             const query = 'DELETE FROM PecasCarro WHERE Codigo = @codigo;';
-            await pool.request()
-                .input('codigo', sql.Int, codigo) // A variável codigo deve ser do tipo sql.Int
+            const resultado = await pool.request()
+                .input('codigo', sql.Int, codigo) // Define o tipo da variável como sql.Int
                 .query(query);
+
+            // Retorna a contagem de linhas afetadas para validação
+            return { affectedRows: resultado.rowsAffected[0] };
         } catch (error) {
             console.error('Erro ao remover peça:', error);
             throw new Error('Erro ao remover peça: ' + error.message);
         }
     }
+
 
 
 }

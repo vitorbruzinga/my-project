@@ -1,6 +1,5 @@
-// models/usuariosModel.js
 import { connectToDatabase } from '../config/dbConfig';
-import bcrypt from 'bcrypt'; // Importando bcrypt
+import bcrypt from 'bcrypt';
 
 class UsuarioModel {
     async cadastrarUsuario(nome, dataNascimento, email, senha) {
@@ -9,8 +8,7 @@ class UsuarioModel {
             const query = `
             INSERT INTO usuarios (nome, email, senha, DataNascimento)
             VALUES (@nome, @email, @senha, @DataNascimento)
-        `;
-
+            `;
             const result = await pool.request()
                 .input('nome', nome)
                 .input('dataNascimento', dataNascimento)
@@ -27,18 +25,17 @@ class UsuarioModel {
     async login(email, senha) {
         const pool = await connectToDatabase();
         try {
-            const usuario = await this.buscarUsuarioPorEmail(email); // Recupera o usuário pelo email
+            const usuario = await this.buscarUsuarioPorEmail(email);
             if (!usuario) {
                 throw new Error('Usuário não encontrado');
             }
 
-            // Verifica se a senha está correta
             const senhaValida = await bcrypt.compare(senha, usuario.senha);
             if (!senhaValida) {
                 throw new Error('Senha incorreta');
             }
 
-            return usuario; // Retorna o usuário se a senha estiver correta
+            return usuario;
         } catch (error) {
             console.error('Erro ao fazer login:', error);
             throw new Error('Erro ao fazer login.');
@@ -52,7 +49,7 @@ class UsuarioModel {
             const result = await pool.request()
                 .input('email', email)
                 .query(query);
-            return result.recordset[0]; // Retorna o primeiro usuário encontrado
+            return result.recordset[0];
         } catch (error) {
             console.error('Erro ao buscar usuário:', error);
             throw new Error('Erro ao buscar usuário.');
@@ -84,6 +81,20 @@ class UsuarioModel {
         } catch (error) {
             console.error('Erro ao deletar usuário:', error);
             throw new Error('Erro ao deletar usuário.');
+        }
+    }
+
+    async definirCodigoRecuperacao(email, codigoRecuperacao) {
+        const pool = await connectToDatabase();
+        try {
+            const query = 'UPDATE usuarios SET codigo_recuperacao = @codigoRecuperacao WHERE email = @Email;';
+            await pool.request()
+                .input('codigoRecuperacao', codigoRecuperacao)
+                .input('email', email)
+                .query(query);
+        } catch (error) {
+            console.error('Erro ao definir código de recuperação:', error);
+            throw new Error('Erro ao definir código de recuperação.');
         }
     }
 }

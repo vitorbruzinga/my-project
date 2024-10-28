@@ -9,17 +9,18 @@ export default function Home() {
     return (
         <View style={styles.container}>
             <ImageBackground source={require('../../../../assets/images/home.png')} style={styles.homeImage} />
-            <Image source={require('../../../../assets/images/minicard.png')} style={styles.minicardImage} />
-            <Text style={styles.title}>Center Car WR</Text>
+            <Image source={require('../../../../assets/images/boxpro_logo.png')} style={styles.minicardImage} />
+            <Text style={styles.title}>Box Pro</Text>
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate('./Screens/Login/login')} // Vai p tela de login
+                onPress={() => navigation.navigate('Screens/Login/login')} // Corrigido para navegar para a tela de login
             >
-                <Text style={styles.buttonText}>SAIBA MAIS</Text>
+                <Text style={styles.buttonText}>ENTRAR</Text>
             </TouchableOpacity>
         </View>
     );
 }
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -47,24 +48,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#FFFFFF',
     },
-    subtitle: {
-        position: 'absolute',
-        top: 80,
-        left: 20,
-        fontSize: 18,
-        color: '#FFFFFF',
-    },
-    heading: {
-        position: 'absolute',
-        top: 150,
-        left: 20,
-        fontSize: 24,
-        color: '#FFFFFF',
-    },
     button: {
         position: 'absolute',
-        top: 400,
-        left: 120,
+        top: 420,
+        left: 150,
         backgroundColor: '#343a40',
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -73,16 +60,5 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#FFFFFF',
         fontSize: 18,
-    },
-    footer: {
-        position: 'absolute',
-        bottom: 0,
-        width: '100%',
-        backgroundColor: '#343a40',
-        padding: 10,
-        alignItems: 'center',
-    },
-    footerText: {
-        color: '#FFFFFF',
     },
 });

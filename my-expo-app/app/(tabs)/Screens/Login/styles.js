@@ -10,13 +10,13 @@ export const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 20, 
+        paddingHorizontal: 20,
     },
     title: {
         color: '#FFF',
         fontWeight: 'bold',
         fontSize: 25,
-        marginBottom: 40, 
+        marginBottom: 40,
         textAlign: 'center',
     },
     form: {
@@ -24,10 +24,10 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         width: '100%',
         backgroundColor: 'rgba(255, 255, 255, 0.85)',
-        paddingVertical: 20, 
-        paddingHorizontal: 15, 
+        paddingVertical: 20,
+        paddingHorizontal: 15,
         borderRadius: 10,
-        width: 280, 
+        width: 280,
 
     },
     inputEmail: {
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
         height: 35,
         borderRadius: 5,
         padding: 5,
-        marginBottom: 15, 
+        marginBottom: 15,
     },
     inputPassword: {
         backgroundColor: '#FFF',
@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
         height: 35,
         borderRadius: 5,
         padding: 5,
-        marginBottom: 20, 
+        marginBottom: 20,
     },
     buttonForm: {
         backgroundColor: '#00229A',
@@ -53,13 +53,15 @@ export const styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20, 
+        marginBottom: 20,
     },
     textButton: {
         color: '#FFF',
         fontWeight: 'bold',
     },
     ButtonCreate: {
+        textDecorationLine: 'underline',
+        fontSize: 15,
         color: '#000',
         fontWeight: 'bold',
         marginTop: 10,

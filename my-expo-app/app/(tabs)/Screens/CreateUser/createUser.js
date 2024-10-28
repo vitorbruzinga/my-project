@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Alert, ImageBackground } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { styles } from './styles';
+import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
+import BackButton from '../backButton';
 
-export default function CreateUser({ navigation }) {
+export default function CreateUser() {
+    const navigation = useNavigation();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -48,7 +51,7 @@ export default function CreateUser({ navigation }) {
 
             if (response.ok) {
                 Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
-                navigation.navigate('login');
+                navigation.navigate('Screens/Login/login');
             } else {
                 Alert.alert('Erro', data.error || 'Ocorreu um erro no cadastro.');
             }
@@ -60,11 +63,13 @@ export default function CreateUser({ navigation }) {
 
     return (
         <ImageBackground
-            source={require('../../../../assets/images/register_bg.png')}
+            source={require('../../../../assets/images/cadastrp_bg.jpg')}
             style={styles.backgroundImage}
+
             imageStyle={{ opacity: 0.5 }} // Escurece a imagem
         >
             <View style={styles.overlay}>
+                <BackButton onPress={() => navigation.navigate('Screens/Login/login')} />
                 <Text style={styles.title}>Cadastro</Text>
 
                 <View style={styles.form}>

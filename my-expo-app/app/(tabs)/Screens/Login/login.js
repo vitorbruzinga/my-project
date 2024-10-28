@@ -1,19 +1,22 @@
+// app/tabs/Screens/Login/login.js
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, TouchableWithoutFeedback, Keyboard, ImageBackground, Alert } from 'react-native';
 import { styles } from './styles';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import BackButton from '../backButton';
 
-export default function Login({ navigation }) {
+export default function Login() {
+    const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     async function handleLogin() {
-        // Validação simples
         if (!email || !password) {
             return Alert.alert('Erro', 'Por favor, preencha todos os campos!');
         }
 
         try {
-            // Requisição POST para o login
             const response = await fetch('http://10.0.2.2:3000/api/usuarios', {
                 method: 'POST',
                 headers: {
@@ -27,12 +30,12 @@ export default function Login({ navigation }) {
             });
 
             const data = await response.json();
+            console.log('Resposta do login:', data);
 
-            // Tratamento da resposta
             if (response.ok) {
+                await AsyncStorage.setItem('token', data.token);
                 Alert.alert('Sucesso', 'Login bem-sucedido!');
-                // Redirect
-                navigation.navigate('Home'); // pagina inicial
+                navigation.navigate('Screens/StartMenu/startmenu', { email: email });
             } else {
                 Alert.alert('Erro', data.error || 'Credenciais inválidas.');
             }
@@ -46,8 +49,8 @@ export default function Login({ navigation }) {
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <ImageBackground source={require('../../../../assets/images/login_bg.png')} style={styles.backgroundImage}>
                 <View style={styles.Container}>
-                    <Text style={styles.title}>SISTEMA DE GESTÃO AUTOMOTIVA & AUTOPEÇAS</Text>
-                    {/* Formulário de login */}
+                    <BackButton onPress={() => navigation.navigate('Screens/HomePage/home')} />
+                    <Text style={styles.title}>BOX PRO - GESTÃO AUTOMOTIVA & AUTOPEÇAS</Text>
                     <View style={styles.form}>
                         <TextInput
                             style={styles.inputEmail}
@@ -69,8 +72,11 @@ export default function Login({ navigation }) {
                         <TouchableOpacity style={styles.buttonForm} onPress={handleLogin}>
                             <Text style={styles.textButton}>Entrar</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('CreateUser')}>
-                            <Text style={styles.ButtonCreate}>Ainda não possui uma conta? Clique aqui e cadastre-se!</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('Screens/ResetPassword/RequestResetCode')}>
+                            <Text style={styles.ButtonCreate}>Esqueci minha senha</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('Screens/CreateUser/createUser')}>
+                            <Text style={styles.ButtonCreate}>Não tem conta? Cadastre-se!</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     title: {
         fontSize: 40,
         fontWeight: 'bold',
-        color: '#000',
+        color: 'white',
         marginBottom: 20,
     },
     form: {

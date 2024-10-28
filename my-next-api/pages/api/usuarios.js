@@ -2,6 +2,7 @@
 import UsuariosModel from '../../models/usuariosModel';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import nodemailer from 'nodemailer'; // Para enviar emails
 
 export default async function handler(req, res) {
     const { acao } = req.body;
@@ -13,7 +14,7 @@ export default async function handler(req, res) {
                     case 'cadastrar':
                         const { nome, dataNascimento, email, senha } = req.body;
                         try {
-                            const hashedPassword = await bcrypt.hash(senha, 10); // Salva a senha como hash
+                            const hashedPassword = await bcrypt.hash(senha, 10);
                             const resultado = await UsuariosModel.cadastrarUsuario(nome, dataNascimento, email, hashedPassword);
                             res.status(201).json({ message: 'Usuário cadastrado com sucesso!', resultado });
                         } catch (error) {
@@ -25,17 +26,13 @@ export default async function handler(req, res) {
                         const { email: emailLogin, senha: senhaLogin } = req.body;
                         try {
                             const usuario = await UsuariosModel.buscarUsuarioPorEmail(emailLogin);
-                            console.log("Usuário encontrado:", usuario);
-                            // Verifique se o usuário foi encontrado
                             if (!usuario) {
                                 return res.status(401).json({ error: 'Credenciais inválidas.' });
                             }
-                            // Comparando a senha fornecida com a senha hashada
                             const senhaCorreta = await bcrypt.compare(senhaLogin, usuario.Senha);
                             if (!senhaCorreta) {
                                 return res.status(401).json({ error: 'Credenciais inválidas.' });
                             }
-                            // Gerando o token JWT
                             const token = jwt.sign({ id: usuario.Id }, 'seu-segredo', { expiresIn: '1h' });
                             res.status(200).json({ message: 'Login bem-sucedido', token });
                         } catch (error) {
@@ -44,8 +41,59 @@ export default async function handler(req, res) {
                         }
                         break;
 
+                    case 'enviar-codigo-recuperacao':
+                        const { email: emailRecuperacao } = req.body;
+                        try {
+                            const usuario = await UsuariosModel.buscarUsuarioPorEmail(emailRecuperacao);
+                            if (!usuario) {
+                                return res.status(404).json({ error: 'Usuário não encontrado.' });
+                            }
+                            const codigoRecuperacao = Math.floor(1000 + Math.random() * 9000).toString(); // Código de 4 dígitos
+
+                            // Configuração de email usando nodemailer
+                            const transporter = nodemailer.createTransport({
+                                service: 'gmail',
+                                auth: {
+                                    user: 'trabalhoreactnative@gmail.com',
+                                    pass: 'xcjx bncb glnp wepp'
+                                }
+                            });
+
+                            const mailOptions = {
+                                from: 'trabalhoreactnative@gmail.com',
+                                to: emailRecuperacao,
+                                subject: 'Código de Recuperação de Senha',
+                                text: `Seu código de recuperação é: ${codigoRecuperacao}`
+                            };
+
+                            await transporter.sendMail(mailOptions);
+                            await UsuariosModel.definirCodigoRecuperacao(emailRecuperacao, codigoRecuperacao);
+                            res.status(200).json({ message: 'Código de recuperação enviado ao email.' });
+                        } catch (error) {
+                            console.error('Erro ao enviar código de recuperação:', error);
+                            res.status(500).json({ error: 'Erro ao enviar código de recuperação.' });
+                        }
+                        break;
+
+                    case 'validar-codigo-e-resetar-senha':
+                        const { email: emailValidacao, codigo, novaSenha } = req.body;
+                        try {
+                            const usuario = await UsuariosModel.buscarUsuarioPorEmail(emailValidacao);
+                            if (!usuario || usuario.codigo_recuperacao !== codigo) {
+                                return res.status(400).json({ error: 'Código de recuperação inválido.' });
+                            }
+                            const hashedPassword = await bcrypt.hash(novaSenha, 10);
+                            await UsuariosModel.atualizarSenha(usuario.Id, hashedPassword);
+                            await UsuariosModel.definirCodigoRecuperacao(emailValidacao, null); // Remove o código após redefinir a senha
+                            res.status(200).json({ message: 'Senha redefinida com sucesso.' });
+                        } catch (error) {
+                            console.error('Erro ao redefinir senha:', error);
+                            res.status(500).json({ error: 'Erro ao redefinir senha.' });
+                        }
+                        break;
+
                     default:
-                        res.status(400).json({ error: 'Ação não reconhecida. Use "cadastrar" ou "login".' });
+                        res.status(400).json({ error: 'Ação não reconhecida.' });
                         break;
                 }
             } catch (error) {
