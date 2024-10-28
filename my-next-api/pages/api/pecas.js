@@ -49,15 +49,13 @@ export default async function handler(req, res) {
             break;
 
         case 'PUT':
-            // Captura o código diretamente da query string
-            const codigoParaAtt = req.query.codigo; // Aqui você captura o código da URL
+            const codigoParaAtt = req.query.codigo;
             const { descricao: novaDescricao, modelosCompativeis: novosModelos } = req.body;
-
             // Log dos valores recebidos
             console.log('Valores recebidos:', { codigoParaAtt, novaDescricao, novosModelos });
 
             try {
-                await PecasModel.atualizarPeca(codigoParaAtt, novaDescricao, novosModelos); // Atualiza a peça com o código capturado
+                await PecasModel.atualizarPeca(codigoParaAtt, novaDescricao, novosModelos);
                 res.status(200).json({ message: 'Peça atualizada com sucesso!' });
             } catch (error) {
                 res.status(500).json({ error: error.message });

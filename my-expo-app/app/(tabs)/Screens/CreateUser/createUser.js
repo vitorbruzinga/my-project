@@ -1,8 +1,9 @@
+// app/tabs/Screens/CreateUser/createUser.js
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Alert, ImageBackground } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { styles } from './styles';
-import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import BackButton from '../backButton';
 
 export default function CreateUser() {
@@ -13,6 +14,17 @@ export default function CreateUser() {
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [birthdate, setBirthdate] = useState('');
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+    // Limpa os campos sempre que a tela ganha foco
+    useFocusEffect(
+        React.useCallback(() => {
+            setName('');
+            setEmail('');
+            setPassword('');
+            setPasswordConfirm('');
+            setBirthdate('');
+        }, [])
+    );
 
     const handleConfirm = (date) => {
         const formattedDate = date.toISOString().split('T')[0];
@@ -65,8 +77,7 @@ export default function CreateUser() {
         <ImageBackground
             source={require('../../../../assets/images/cadastrp_bg.jpg')}
             style={styles.backgroundImage}
-
-            imageStyle={{ opacity: 0.5 }} // Escurece a imagem
+            imageStyle={{ opacity: 0.5 }}
         >
             <View style={styles.overlay}>
                 <BackButton onPress={() => navigation.navigate('Screens/Login/login')} />
@@ -81,6 +92,7 @@ export default function CreateUser() {
                         placeholderTextColor='#000'
                         autoCorrect={false}
                         onChangeText={setName}
+                        value={name}
                     />
                     <TextInput
                         style={styles.inputForm}
@@ -90,6 +102,7 @@ export default function CreateUser() {
                         autoCorrect={false}
                         placeholderTextColor='#000'
                         onChangeText={setEmail}
+                        value={email}
                     />
                     <TextInput
                         style={styles.inputForm}
@@ -100,6 +113,7 @@ export default function CreateUser() {
                         placeholderTextColor='#000'
                         autoCorrect={false}
                         onChangeText={setPassword}
+                        value={password}
                     />
                     <TextInput
                         style={styles.inputForm}
@@ -110,6 +124,7 @@ export default function CreateUser() {
                         autoCorrect={false}
                         placeholderTextColor='#000'
                         onChangeText={setPasswordConfirm}
+                        value={passwordConfirm}
                     />
 
                     <TouchableOpacity style={styles.buttonForm} onPress={() => setDatePickerVisibility(true)}>

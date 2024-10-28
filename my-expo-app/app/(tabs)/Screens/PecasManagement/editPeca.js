@@ -14,7 +14,6 @@ export default function EditPeca() {
 
     useFocusEffect(
         React.useCallback(() => {
-            // Configura os estados com os valores recebidos da navegação
             setCodigo(codigo);
             setDescricao(descricao);
             setModelos(modelos);
@@ -33,12 +32,12 @@ export default function EditPeca() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ descricao: descricaoState, modelosCompativeis: modelosState }), // Corrigido para usar a chave correta
+                body: JSON.stringify({ descricao: descricaoState, modelosCompativeis: modelosState }),
             });
 
             if (response.ok) {
                 Alert.alert('Sucesso', 'Peça atualizada com sucesso!');
-                navigation.navigate('Screens/PecasManagement/pecaslistening'); // Certifique-se de que este é o caminho correto
+                navigation.navigate('Screens/PecasManagement/pecaslistening');
             } else {
                 Alert.alert('Erro', 'Falha ao atualizar a peça.');
             }

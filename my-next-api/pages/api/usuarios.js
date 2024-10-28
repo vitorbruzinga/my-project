@@ -2,7 +2,7 @@
 import UsuariosModel from '../../models/usuariosModel';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import nodemailer from 'nodemailer'; // Para enviar emails
+import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
     const { acao } = req.body;

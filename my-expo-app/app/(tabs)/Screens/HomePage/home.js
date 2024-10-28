@@ -13,7 +13,7 @@ export default function Home() {
             <Text style={styles.title}>Box Pro</Text>
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate('Screens/Login/login')} // Corrigido para navegar para a tela de login
+                onPress={() => navigation.navigate('Screens/Login/login')}
             >
                 <Text style={styles.buttonText}>ENTRAR</Text>
             </TouchableOpacity>

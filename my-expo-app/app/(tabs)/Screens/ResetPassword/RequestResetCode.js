@@ -1,11 +1,18 @@
+// app/tabs/Screens/ForgotPassword/ForgotPasswordScreen.js
 import React, { useState } from 'react';
 import { Image, View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import BackButton from '../backButton';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 export default function ForgotPasswordScreen() {
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
+
+    useFocusEffect(
+        React.useCallback(() => {
+            setEmail('');
+        }, [])
+    );
 
     const handleSendCode = async () => {
         if (!email) {
@@ -28,7 +35,7 @@ export default function ForgotPasswordScreen() {
 
             if (response.ok) {
                 Alert.alert('Sucesso', 'Código enviado para o seu email.');
-                navigation.navigate('Screens/ResetPassword/resetPassword', { email }); // Navega para a tela de redefinição
+                navigation.navigate('Screens/ResetPassword/resetPassword', { email });
             } else {
                 Alert.alert('Erro', data.error || 'Erro ao enviar o código.');
             }

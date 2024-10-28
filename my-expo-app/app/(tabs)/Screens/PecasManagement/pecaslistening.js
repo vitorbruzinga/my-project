@@ -1,17 +1,20 @@
 // app/tabs/Screens/PecasManagement/pecaslistening.js
 import React, { useEffect, useState } from 'react';
-import { Image, View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { Image, View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, TextInput } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native'; // Importar useFocusEffect
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import BackButton from '../backButton';
 
 export default function PecasListening() {
     const [pecas, setPecas] = useState([]);
+    const [searchText, setSearchText] = useState('');
+    const [searchBy, setSearchBy] = useState('codigo');
+    const [filteredPecas, setFilteredPecas] = useState([]);
     const navigation = useNavigation();
 
     useFocusEffect(
         React.useCallback(() => {
-            fetchPecas(); // Buscar peças ao focar na tela
+            fetchPecas();
         }, [])
     );
 
@@ -24,6 +27,7 @@ export default function PecasListening() {
 
             if (Array.isArray(data)) {
                 setPecas(data);
+                setFilteredPecas(data); // Inicialmente, as peças filtradas são todas as peças
             } else {
                 console.error('Erro: dados inesperados do backend', data);
                 Alert.alert('Erro', 'Ocorreu um erro ao buscar as peças.');
@@ -32,6 +36,27 @@ export default function PecasListening() {
             console.error('Erro ao buscar peças:', error);
             Alert.alert('Erro', 'Falha ao conectar com o servidor.');
         }
+    };
+
+    const handleSearch = (text) => {
+        setSearchText(text); // Atualiza o texto de busca
+
+        if (text.trim() === '') {
+            setFilteredPecas(pecas); // Se não houver texto de busca, mostra todas as peças
+            return;
+        }
+
+        const filtered = pecas.filter(peca => {
+            const searchValue = text.toLowerCase();
+            if (searchBy === 'codigo') {
+                return peca.Codigo.toString().toLowerCase().includes(searchValue);
+            } else if (searchBy === 'descricao') {
+                return peca.Descricao.toLowerCase().includes(searchValue);
+            }
+            return false;
+        });
+
+        setFilteredPecas(filtered);
     };
 
     const deletePeca = async (codigo) => {
@@ -43,7 +68,7 @@ export default function PecasListening() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ codigo }), // Enviando o código no corpo da requisição
+                body: JSON.stringify({ codigo }),
             });
 
             if (!response.ok) {
@@ -80,23 +105,34 @@ export default function PecasListening() {
                 source={require('../../../../assets/images/boxpro_logo.png')}
                 style={styles.logo}
             />
-            {pecas.length > 0 ? (
+            <View style={styles.searchContainer}>
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder={`Buscar por ${searchBy === 'codigo' ? 'Código' : 'Descrição'}`}
+                    value={searchText}
+                    onChangeText={handleSearch}
+                />
+                <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+                    <MaterialIcons name="search" size={24} color="white" />
+                </TouchableOpacity>
+            </View>
+            {filteredPecas.length > 0 ? (
                 <FlatList
-                    data={pecas}
+                    data={filteredPecas}
                     keyExtractor={(item) => item.Codigo ? item.Codigo.toString() : Math.random().toString()}
                     renderItem={({ item }) => (
                         <View style={styles.pecaCard}>
                             <Text style={styles.pecaText}>{`Código: ${item.Codigo || 'N/A'}`}</Text>
                             <Text style={styles.pecaText}>{`Descrição: ${item.Descricao || 'N/A'}`}</Text>
+                            <Text style={styles.pecaText}>{`Modelos Compatíveis: ${item.ModelosCompativeis || 'N/A'}`}</Text>
                             <View style={styles.buttonContainer}>
                                 <TouchableOpacity
                                     onPress={() => navigation.navigate('Screens/PecasManagement/editPeca', {
                                         codigo: item.Codigo,
                                         descricao: item.Descricao,
-                                        modelos: item.ModelosCompativeis // Atualize para ModelosCompativeis
+                                        modelos: item.ModelosCompativeis
                                     })}
                                 >
-
                                     <MaterialIcons name="edit" size={24} color="blue" />
                                 </TouchableOpacity>
 
@@ -122,29 +158,48 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         left: 25,
         marginTop: 50,
-        width: 300, // Ajuste o tamanho conforme necessário
-        height: 150, // Ajuste o tamanho conforme necessário
-        marginBottom: 25 // Margem para não ficar muito colado em cima
+        width: 300,
+        height: 150,
+        marginBottom: 25
     },
     container: {
         flex: 1,
         backgroundColor: '#000',
         padding: 20,
     },
-    pecaCard: {
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        padding: 15,
-        marginVertical: 8,
+    searchContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        marginBottom: 20,
+    },
+    searchInput: {
+        flex: 1,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        padding: 10,
+        marginRight: 10,
+    },
+    searchButton: {
+        backgroundColor: '#007BFF',
+        borderRadius: 5,
+        padding: 10,
+        justifyContent: 'center',
         alignItems: 'center',
+    },
+    pecaCard: {
+        backgroundColor: '#e0e0e0',
+        borderRadius: 8,
+        padding: 20,
+        marginVertical: 8,
+        flexDirection: 'column',
     },
     pecaText: {
         fontSize: 13,
+        marginBottom: 5,
     },
     buttonContainer: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
     },
     addButton: {
         position: 'absolute',

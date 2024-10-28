@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, TouchableWithoutFeedback, Keyboard, ImageBackground, Alert } from 'react-native';
 import { styles } from './styles';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackButton from '../backButton';
 
@@ -10,6 +10,14 @@ export default function Login() {
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    // Limpa os campos de email e senha sempre que a tela ganha foco
+    useFocusEffect(
+        React.useCallback(() => {
+            setEmail('');
+            setPassword('');
+        }, [])
+    );
 
     async function handleLogin() {
         if (!email || !password) {
@@ -59,6 +67,7 @@ export default function Login() {
                             autoCapitalize='none'
                             placeholderTextColor='#000'
                             onChangeText={setEmail}
+                            value={email}
                         />
                         <TextInput
                             style={styles.inputPassword}
@@ -68,6 +77,7 @@ export default function Login() {
                             placeholderTextColor='#000'
                             secureTextEntry={true}
                             onChangeText={setPassword}
+                            value={password}
                         />
                         <TouchableOpacity style={styles.buttonForm} onPress={handleLogin}>
                             <Text style={styles.textButton}>Entrar</Text>

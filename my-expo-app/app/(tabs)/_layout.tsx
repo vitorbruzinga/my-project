@@ -7,7 +7,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarStyle: { display: 'none' },
-        headerShown: false, // Esconde o cabeçalho
+        headerShown: false,
       }}
     >
       {/* Aba da Tela Inicial */}
@@ -30,13 +30,13 @@ export default function TabLayout() {
 
       {/* Aba de Listagem de Peças */}
       <Tabs.Screen
-        name="Screens/PecasManagement/pecaslistening" // Incluindo a tela de listagem
+        name="Screens/PecasManagement/pecaslistening"
         options={{ tabBarLabel: 'Listar Peças' }}
       />
 
       {/* Aba de Edição de Peça */}
       <Tabs.Screen
-        name="Screens/PecasManagement/editPeca" // Incluindo a tela de edição
+        name="Screens/PecasManagement/editPeca"
         options={{ tabBarLabel: 'Editar Peça' }} // Esse label não será exibido se a tab estiver oculta
       />
 

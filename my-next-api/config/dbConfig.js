@@ -6,7 +6,7 @@ const config = {
     server: 'DESKTOP-QBPCFSG',
     database: 'ProjetoReact',
     options: {
-        encrypt: false, // Se estiver usando Azure
+        encrypt: false, //Azure
         enableArithAbort: true
     }
 };
@@ -21,5 +21,4 @@ async function connectToDatabase() {
     }
 }
 
-// Mude de module.exports para exportar
 export { connectToDatabase, sql };

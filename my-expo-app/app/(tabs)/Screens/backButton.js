@@ -18,10 +18,10 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         left: 10,
-        zIndex: 1, // Certifique-se de que o botão está na frente
+        zIndex: 1,
     },
     button: {
-        padding: 10, // Ajuste conforme necessário
+        padding: 10,
     },
 });
 

@@ -6,7 +6,7 @@ import BackButton from '../backButton';
 const ValidateCode = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { email } = route.params; // Obtém o email dos parâmetros da navegação
+    const { email } = route.params;
     const [codigo, setCodigo] = useState('');
     const [novaSenha, setNovaSenha] = useState('');
     const [confirmarSenha, setConfirmarSenha] = useState('');
@@ -33,7 +33,7 @@ const ValidateCode = () => {
 
             if (response.ok) {
                 Alert.alert('Sucesso', 'Senha redefinida com sucesso!');
-                navigation.navigate('Screens/Login/login'); // Redireciona para a tela de login
+                navigation.navigate('Screens/Login/login');
             } else {
                 Alert.alert('Erro', data.error || 'Código de recuperação inválido.');
             }
