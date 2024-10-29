@@ -1,3 +1,4 @@
+//config/dbConfig.js
 const sql = require('mssql');
 
 const config = {

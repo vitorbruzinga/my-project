@@ -1,3 +1,4 @@
+// models/usuariosModel.js
 import { connectToDatabase } from '../config/dbConfig';
 import bcrypt from 'bcrypt';
 

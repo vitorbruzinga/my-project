@@ -1,3 +1,4 @@
+// pages/api/testConnection.js
 import { connectToDatabase } from '../../config/dbConfig';
 
 export default async function handler(req, res) {

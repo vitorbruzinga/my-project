@@ -1,5 +1,5 @@
 // models/pecasModel.js
-import sql from 'mssql'; // Certifique-se de que isso está no início do seu arquivo
+import sql from 'mssql'; 
 import { connectToDatabase } from '../config/dbConfig';
 
 class PecasModel {
@@ -16,11 +16,11 @@ class PecasModel {
                 VALUES (@codigo, @descricao, @modelosCompativeis);
             `;
             const result = await pool.request()
-                .input('codigo', sql.Int, codigo) // Defina o tipo de dados para o input
-                .input('descricao', sql.NVarChar(255), descricao) // Tipo de dado correto para Descricao
-                .input('modelosCompativeis', sql.NVarChar(255), modelosCompativeis) // Tipo de dado correto para ModelosCompativeis
+                .input('codigo', sql.Int, codigo) 
+                .input('descricao', sql.NVarChar(255), descricao) 
+                .input('modelosCompativeis', sql.NVarChar(255), modelosCompativeis) 
                 .query(query);
-            return result.rowsAffected; // Retorna o número de linhas afetadas
+            return result.rowsAffected; 
         } catch (error) {
             console.error('Erro ao cadastrar peça:', error);
             throw new Error('Erro ao cadastrar peça: ' + error.message);
@@ -43,9 +43,9 @@ class PecasModel {
         try {
             const query = 'SELECT * FROM PecasCarro WHERE Codigo = @codigo;';
             const result = await pool.request()
-                .input('codigo', sql.Int, codigo) // Adicionei o tipo de dado
+                .input('codigo', sql.Int, codigo) 
                 .query(query);
-            return result.recordset[0]; // Retorna a peça encontrada
+            return result.recordset[0]; 
         } catch (error) {
             console.error('Erro ao buscar peça:', error);
             throw new Error('Erro ao buscar peça: ' + error.message);
@@ -56,7 +56,7 @@ class PecasModel {
         const pool = await connectToDatabase();
         try {
             // Validação dos parâmetros
-            console.log('Valores recebidos:', { codigo, descricao, modelosCompativeis }); // Log dos valores
+            console.log('Valores recebidos:', { codigo, descricao, modelosCompativeis });
 
             if (!descricao || typeof descricao !== 'string' || descricao.trim() === '') {
                 throw new Error('Descrição inválida. Deve ser uma string não vazia.');
@@ -76,8 +76,8 @@ class PecasModel {
 
             const result = await pool.request()
                 .input('codigo', sql.Int, codigo)
-                .input('descricao', sql.NVarChar(255), descricao.trim()) // Adiciona trim aqui
-                .input('modelosCompativeis', sql.NVarChar(255), modelosCompativeis.trim()) // Adiciona trim aqui
+                .input('descricao', sql.NVarChar(255), descricao.trim()) 
+                .input('modelosCompativeis', sql.NVarChar(255), modelosCompativeis.trim()) 
                 .query(query);
 
             if (result.rowsAffected[0] === 0) {
@@ -95,10 +95,9 @@ class PecasModel {
         try {
             const query = 'DELETE FROM PecasCarro WHERE Codigo = @codigo;';
             const resultado = await pool.request()
-                .input('codigo', sql.Int, codigo) // Define o tipo da variável como sql.Int
+                .input('codigo', sql.Int, codigo) 
                 .query(query);
 
-            // Retorna a contagem de linhas afetadas para validação
             return { affectedRows: resultado.rowsAffected[0] };
         } catch (error) {
             console.error('Erro ao remover peça:', error);
