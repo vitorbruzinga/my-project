@@ -1,5 +1,5 @@
 // models/pecasModel.js
-import sql from 'mssql'; 
+import sql from 'mssql';
 import { connectToDatabase } from '../config/dbConfig';
 
 class PecasModel {
@@ -16,11 +16,11 @@ class PecasModel {
                 VALUES (@codigo, @descricao, @modelosCompativeis);
             `;
             const result = await pool.request()
-                .input('codigo', sql.Int, codigo) 
-                .input('descricao', sql.NVarChar(255), descricao) 
-                .input('modelosCompativeis', sql.NVarChar(255), modelosCompativeis) 
+                .input('codigo', sql.Int, codigo)
+                .input('descricao', sql.NVarChar(255), descricao)
+                .input('modelosCompativeis', sql.NVarChar(255), modelosCompativeis)
                 .query(query);
-            return result.rowsAffected; 
+            return result.rowsAffected;
         } catch (error) {
             console.error('Erro ao cadastrar peça:', error);
             throw new Error('Erro ao cadastrar peça: ' + error.message);
@@ -43,14 +43,43 @@ class PecasModel {
         try {
             const query = 'SELECT * FROM PecasCarro WHERE Codigo = @codigo;';
             const result = await pool.request()
-                .input('codigo', sql.Int, codigo) 
+                .input('codigo', sql.Int, codigo)
                 .query(query);
-            return result.recordset[0]; 
+            return result.recordset[0];
         } catch (error) {
             console.error('Erro ao buscar peça:', error);
             throw new Error('Erro ao buscar peça: ' + error.message);
         }
     }
+
+    async buscarPecaPorDescricao(descricao) {
+        const pool = await connectToDatabase();
+        try {
+            const query = 'SELECT * FROM PecasCarro WHERE Descricao LIKE @descricao;';
+            const result = await pool.request()
+                .input('descricao', sql.VarChar, `%${descricao}%`)
+                .query(query);
+            return result.recordset;
+        } catch (error) {
+            console.error('Erro ao buscar peça por descrição:', error);
+            throw new Error('Erro ao buscar peça: ' + error.message);
+        }
+    }
+
+    async buscarPecaPorModelos(modelos) {
+        const pool = await connectToDatabase();
+        try {
+            const query = 'SELECT * FROM PecasCarro WHERE ModelosCompativeis LIKE @modelos;';
+            const result = await pool.request()
+                .input('modelos', sql.VarChar, `%${modelos}%`)
+                .query(query);
+            return result.recordset;
+        } catch (error) {
+            console.error('Erro ao buscar peça por modelos:', error);
+            throw new Error('Erro ao buscar peça: ' + error.message);
+        }
+    }
+
 
     async atualizarPeca(codigo, descricao, modelosCompativeis) {
         const pool = await connectToDatabase();
@@ -76,8 +105,8 @@ class PecasModel {
 
             const result = await pool.request()
                 .input('codigo', sql.Int, codigo)
-                .input('descricao', sql.NVarChar(255), descricao.trim()) 
-                .input('modelosCompativeis', sql.NVarChar(255), modelosCompativeis.trim()) 
+                .input('descricao', sql.NVarChar(255), descricao.trim())
+                .input('modelosCompativeis', sql.NVarChar(255), modelosCompativeis.trim())
                 .query(query);
 
             if (result.rowsAffected[0] === 0) {
@@ -95,7 +124,7 @@ class PecasModel {
         try {
             const query = 'DELETE FROM PecasCarro WHERE Codigo = @codigo;';
             const resultado = await pool.request()
-                .input('codigo', sql.Int, codigo) 
+                .input('codigo', sql.Int, codigo)
                 .query(query);
 
             return { affectedRows: resultado.rowsAffected[0] };

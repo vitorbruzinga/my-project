@@ -26,25 +26,27 @@ export default async function handler(req, res) {
             break;
 
         case 'GET':
-            const { codigo: codigoConsulta } = req.query;
-            if (codigoConsulta) {
-                try {
-                    const peca = await PecasModel.buscarPecaPorCodigo(codigoConsulta);
-                    if (peca) {
-                        res.status(200).json(peca);
-                    } else {
-                        res.status(404).json({ message: 'Peça não encontrada.' });
-                    }
-                } catch (error) {
-                    res.status(500).json({ error: error.message });
+            const { codigo: codigoConsulta, descricao: descricaoConsulta, modelos: modelosConsulta } = req.query;
+
+            try {
+                let peca;
+                if (codigoConsulta) {
+                    peca = await PecasModel.buscarPecaPorCodigo(codigoConsulta);
+                } else if (descricaoConsulta) {
+                    peca = await PecasModel.buscarPecaPorDescricao(descricaoConsulta);
+                } else if (modelosConsulta) {
+                    peca = await PecasModel.buscarPecaPorModelos(modelosConsulta);
+                } else {
+                    peca = await PecasModel.listarPecas();
                 }
-            } else {
-                try {
-                    const pecas = await PecasModel.listarPecas();
-                    res.status(200).json(pecas);
-                } catch (error) {
-                    res.status(500).json({ error: error.message });
+
+                if (peca && peca.length) {
+                    res.status(200).json(peca);
+                } else {
+                    res.status(404).json({ message: 'Peça não encontrada.' });
                 }
+            } catch (error) {
+                res.status(500).json({ error: error.message });
             }
             break;
 

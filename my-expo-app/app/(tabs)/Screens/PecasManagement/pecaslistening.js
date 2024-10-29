@@ -1,6 +1,6 @@
-// app/tabs/Screens/PecasManagement/pecaslistening.js
 import React, { useEffect, useState } from 'react';
 import { Image, View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, TextInput } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import BackButton from '../backButton';
@@ -15,6 +15,9 @@ export default function PecasListening() {
     useFocusEffect(
         React.useCallback(() => {
             fetchPecas();
+            setSearchText('');
+            setSearchBy('codigo');
+            setFilteredPecas([]);
         }, [])
     );
 
@@ -23,11 +26,9 @@ export default function PecasListening() {
             const response = await fetch('http://10.0.2.2:3000/api/pecas');
             const data = await response.json();
 
-            console.log('Dados recebidos do backend:', data);
-
             if (Array.isArray(data)) {
                 setPecas(data);
-                setFilteredPecas(data); // Inicialmente, as peças filtradas são todas as peças
+                setFilteredPecas(data);
             } else {
                 console.error('Erro: dados inesperados do backend', data);
                 Alert.alert('Erro', 'Ocorreu um erro ao buscar as peças.');
@@ -38,31 +39,29 @@ export default function PecasListening() {
         }
     };
 
-    const handleSearch = (text) => {
-        setSearchText(text); // Atualiza o texto de busca
-
-        if (text.trim() === '') {
-            setFilteredPecas(pecas); // Se não houver texto de busca, mostra todas as peças
+    useEffect(() => {
+        if (searchText.trim() === '') {
+            setFilteredPecas(pecas);
             return;
         }
 
         const filtered = pecas.filter(peca => {
-            const searchValue = text.toLowerCase();
+            const searchValue = searchText.toLowerCase();
             if (searchBy === 'codigo') {
                 return peca.Codigo.toString().toLowerCase().includes(searchValue);
             } else if (searchBy === 'descricao') {
                 return peca.Descricao.toLowerCase().includes(searchValue);
+            } else if (searchBy === 'modelos') {
+                return peca.ModelosCompativeis && peca.ModelosCompativeis.toLowerCase().includes(searchValue);
             }
             return false;
         });
 
         setFilteredPecas(filtered);
-    };
+    }, [searchText, searchBy, pecas]);
 
     const deletePeca = async (codigo) => {
         try {
-            console.log(`Tentando deletar peça com código: ${codigo}`);
-
             const response = await fetch('http://10.0.2.2:3000/api/pecas', {
                 method: 'DELETE',
                 headers: {
@@ -71,16 +70,11 @@ export default function PecasListening() {
                 body: JSON.stringify({ codigo }),
             });
 
-            if (!response.ok) {
-                console.log('Resposta não OK do servidor:', response.status);
+            if (response.ok) {
+                fetchPecas();
+            } else {
                 throw new Error(`Erro ao deletar peça: Código ${response.status}`);
             }
-
-            const result = await response.json();
-            console.log('Resposta do servidor para exclusão:', result);
-
-            fetchPecas(); // Atualiza a lista de peças após exclusão
-
         } catch (error) {
             console.error('Erro ao deletar peça:', error);
             Alert.alert('Erro', 'Falha ao excluir a peça.');
@@ -101,21 +95,27 @@ export default function PecasListening() {
     return (
         <View style={styles.container}>
             <BackButton onPress={() => navigation.navigate('Screens/StartMenu/startmenu')} />
-            <Image
-                source={require('../../../../assets/images/boxpro_logo.png')}
-                style={styles.logo}
-            />
+            <Image source={require('../../../../assets/images/boxpro_logo.png')} style={styles.logo} />
             <View style={styles.searchContainer}>
                 <TextInput
                     style={styles.searchInput}
-                    placeholder={`Buscar por ${searchBy === 'codigo' ? 'Código' : 'Descrição'}`}
+                    placeholder={`Buscar por ${searchBy === 'codigo' ? 'Código' : searchBy === 'descricao' ? 'Descrição' : 'Modelos'}`}
                     value={searchText}
-                    onChangeText={handleSearch}
+                    onChangeText={setSearchText}
                 />
-                <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+                <TouchableOpacity onPress={() => { }} style={styles.searchButton}>
                     <MaterialIcons name="search" size={24} color="white" />
                 </TouchableOpacity>
             </View>
+            <Picker
+                selectedValue={searchBy}
+                style={styles.picker}
+                onValueChange={(itemValue) => setSearchBy(itemValue)}
+            >
+                <Picker.Item label="Código" value="codigo" />
+                <Picker.Item label="Descrição" value="descricao" />
+                <Picker.Item label="Modelos" value="modelos" />
+            </Picker>
             {filteredPecas.length > 0 ? (
                 <FlatList
                     data={filteredPecas}
@@ -142,6 +142,9 @@ export default function PecasListening() {
                             </View>
                         </View>
                     )}
+                    contentContainerStyle={styles.listContent}
+                    showsVerticalScrollIndicator={false}
+                    initialNumToRender={2}
                 />
             ) : (
                 <Text style={styles.emptyMessage}>Nenhuma peça cadastrada.</Text>
@@ -185,6 +188,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    picker: {
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        marginBottom: 20,
+    },
     pecaCard: {
         backgroundColor: '#e0e0e0',
         borderRadius: 8,
@@ -200,6 +208,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 10,
+    },
+    listContent: {
+        paddingBottom: 100, // Espaço extra para que o botão "+" fique sempre visível
     },
     addButton: {
         position: 'absolute',

@@ -59,7 +59,7 @@ export default function AddPeca() {
                 placeholder="Código"
                 value={codigo}
                 onChangeText={(text) => setCodigo(text.replace(/[^0-9]/g, ''))} // Remove qualquer caractere que não seja número
-                keyboardType="numeric" // Define o teclado numérico
+                keyboardType="numeric" 
             />
 
             <TextInput
