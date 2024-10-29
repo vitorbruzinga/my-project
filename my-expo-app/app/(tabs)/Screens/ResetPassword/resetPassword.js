@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Image, View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import BackButton from '../backButton';
 
 const ValidateCode = () => {
@@ -10,6 +10,15 @@ const ValidateCode = () => {
     const [codigo, setCodigo] = useState('');
     const [novaSenha, setNovaSenha] = useState('');
     const [confirmarSenha, setConfirmarSenha] = useState('');
+
+    useFocusEffect(
+        useCallback(() => {
+            // Limpa os campos ao entrar na tela
+            setCodigo('');
+            setNovaSenha('');
+            setConfirmarSenha('');
+        }, [])
+    );
 
     const handleResetPassword = async () => {
         if (novaSenha !== confirmarSenha) {
